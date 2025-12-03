@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Рожева галерея — сердечка і партикли</title>
+  <style>
+    :root{
+      --bg1: #fff0f6;
+      --bg2: #ffd6e8;
+      --accent: #ff6fa3;
+      --muted: #f7cfe6;
+      --glass: rgba(255,255,255,0.35);
+      --text: #3b1b2b;
+      --shadow: 0 8px 30px rgba(107,27,64,0.12);
+      --radius: 14px;
+    }
+    html,body{height:100%;}
+    body{
+      margin:0; font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+      background: radial-gradient(1200px 800px at 10% 10%, var(--bg2), transparent 20%),
+                  linear-gradient(180deg,#ffd8e8 0%, #f1a4de 50%, #f0a0d8 100%);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      display:flex; align-items:flex-start; justify-content:center; padding:48px;
+      box-sizing:border-box;
+      overflow-x:hidden;
+    }
+
+    .wrap{
+      width:100%; max-width:1100px; background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.45));
+      border-radius:22px; padding:28px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+      backdrop-filter: blur(6px) saturate(120%);
+      z-index: 10;
+    }
+
+    header{display:flex; align-items:center; gap:16px; margin-bottom:18px}
+    .logo{
+      width:68px; height:68px; border-radius:16px; display:flex; align-items:center; justify-content:center;
+      background:linear-gradient(135deg,var(--accent), #ffc1da); font-size:28px; color:white; box-shadow:0 6px 18px rgba(255,111,163,0.18);
+    }
+    h1{font-size:20px; margin:0}
+    p.lead{margin:0; opacity:0.9; font-size:13px}
+
+    /* gallery */
+    .controls{display:flex; gap:10px; margin-top:8px; margin-bottom:18px; align-items:center}
+    .btn{background:var(--glass); border:1px solid rgba(255,255,255,0.6); padding:8px 12px; border-radius:10px; cursor:pointer;}
+
+    .grid{
+      display:grid; 
+      /* Змінено для кращої адаптивності на середніх екранах */
+      grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); 
+      gap:14px;
+    }
+    .card{
+      position:relative; border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(107,27,64,0.06); cursor:pointer;
+      transition:transform .35s cubic-bezier(.2,.8,.2,1),box-shadow .25s;
+      background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.3));
+      border:1px solid rgba(255,255,255,0.6);
+    }
+    .card:hover{transform:translateY(-6px) scale(1.01);}
+    /* Висота зображення зменшена для компактності на мобільних */
+    .card img{width:100%; height:260px; object-fit:cover; display:block;}
+    .meta{position:absolute; left:12px; bottom:12px; right:12px; display:flex; justify-content:space-between; align-items:center}
+    .title{background:linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.2)); padding:6px 10px; border-radius:10px; font-size:13px}
+    .heart-btn{display:inline-flex; align-items:center; gap:6px; padding:6px 8px; border-radius:999px; background: rgba(255,255,255,0.28); font-weight:600}
+
+    /* lightbox */
+    .lightbox{position:fixed; inset:0; display:none; align-items:center; justify-content:center; background:rgba(12,6,12,0.5); z-index:60}
+    .lightbox.open{display:flex}
+    .lightbox .box{max-width:92%; max-height:92%; border-radius:14px; overflow:hidden; box-shadow:0 30px 60px rgba(0,0,0,0.45)}
+    .lightbox img{display:block; max-width:100%; max-height:100%;}
+    .close{position:absolute; top:20px; right:20px; background:var(--glass); border-radius:10px; padding:8px}
+
+    /* particle canvas sits above background but below content */
+    canvas#particles{
+      position:fixed; 
+      top:0;
+      left:0;
+      width:100%;
+      height:100%;
+      pointer-events:none; 
+      z-index:2; 
+    }
+    
+    footer{margin-top:18px; font-size:12px; opacity:0.8; text-align:center;} /* Вирівняно по центру */
+
+    /* === МЕДІА-ЗАПИТИ ДЛЯ ТЕЛЕФОНІВ === */
+    /* Максимум 768px (планшети та великі телефони) */
+    @media (max-width: 768px) {
+        body {
+            padding: 24px 16px; /* Зменшення вертикального і горизонтального padding */
+        }
+        .wrap {
+            padding: 16px;
+        }
+    }
+    /* Максимум 520px (більшість телефонів) */
+    @media (max-width: 520px){
+      /* Галерея в один стовпець */
+      .grid{
+          grid-template-columns: 1fr;
+      }
+      /* Зменшення висоти зображень */
+      .card img{height:200px} 
+      
+      /* Заголовок та логотип */
+      header {
+          flex-direction: column;
+          text-align: center;
+          gap: 10px;
+          margin-bottom: 16px;
+      }
+      .logo {
+          width: 50px;
+          height: 50px;
+          font-size: 20px;
+      }
+      h1 {
+          font-size: 18px;
+      }
+      p.lead {
+          font-size: 12px;
+      }
+      /* Кнопки під заголовок */
+      .controls {
+          justify-content: center;
+          margin-top: 12px;
+          flex-wrap: wrap; /* Дозволяє кнопкам переноситися, якщо не поміщаються */
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles"></canvas>
+  
+  <div class="wrap" aria-live="polite">
+    <header>
+      <div class="logo">❤</div>
+      <div>
+        <h1>Рожева галерея</h1>
+        <p class="lead">Мила обгортка для твоїх фотографій — із плаваючими сердечками та легким лайтбоксом.</p>
+        <div class="controls">
+          <button class="btn" id="addHeart">Додати сердець</button>
+          <button class="btn" id="toggleAuto">Пауза/Пуск партиклів</button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="grid" id="gallery">
+        <article class="card">
+          <img src="img/photo_2025-11-30_03-55-23.jpg" alt="Фото 1">
+          <div class="meta">
+            <div class="title">Момент 1</div>
+            <div class="heart-btn">❤ <span class="likes">12</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <img src="img\photo_2025-11-30_04-02-46.jpg" alt="Фото 2">
+          <div class="meta">
+            <div class="title">Момент 2</div>
+            <div class="heart-btn">❤ <span class="likes">8</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <img src="img\photo_2025-11-30_04-05-38.jpg" alt="Фото 3">
+          <div class="meta">
+            <div class="title">Момент 3</div>
+            <div class="heart-btn">❤ <span class="likes">4</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <img src="img\photo_2025-11-30_05-11-03.jpg" alt="Фото 4">
+          <div class="meta">
+            <div class="title">Момент 4</div>
+            <div class="heart-btn">❤ <span class="likes">22</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <img src="img\photo_2025-11-30_05-11-19 (2).jpg" alt="Фото 5">
+          <div class="meta">
+            <div class="title">Момент 5</div>
+            <div class="heart-btn">❤ <span class="likes">12</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <img src="img\photo_2025-11-30_05-11-19.jpg" alt="Фото 6">
+          <div class="meta">
+            <div class="title">Момент 6</div>
+            <div class="heart-btn">❤ <span class="likes">8</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <img src="img\photo_2025-12-01_03-17-12.jpg" alt="Фото 7">
+          <div class="meta">
+            <div class="title">Момент 7</div>
+            <div class="heart-btn">❤ <span class="likes">4</span></div>
+          </div>
+        </article>
+        <article class="card">
+          <img src="img\photo_2025-12-01_03-17-50.jpg" alt="Фото 8">
+          <div class="meta">
+            <div class="title">Момент 8</div>
+            <div class="heart-btn">❤ <span class="likes">22</span></div>
+          </div>
+        </article>
+      </section>
+    </main>
+
+  
+  </div>
+
+  <div class="lightbox" id="lightbox" role="dialog" aria-hidden="true">
+    <button class="close btn" id="close">✕</button>
+    <div class="box"><img id="lightbox-img" src="" alt="Велике фото"></div>
+  </div>
+
+  <script>
+    // LIGHTBOX
+    const gallery = document.getElementById('gallery');
+    const lb = document.getElementById('lightbox');
+    const lbImg = document.getElementById('lightbox-img');
+    gallery.addEventListener('click', e => {
+      const card = e.target.closest('.card');
+      if(!card) return;
+      const url = card.querySelector('img').src; 
+      lbImg.src = url;
+      lb.classList.add('open');
+      lb.setAttribute('aria-hidden','false');
+    });
+    document.getElementById('close').addEventListener('click', ()=>{ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); });
+    lb.addEventListener('click', (e)=>{ if(e.target === lb) { lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); } });
+
+    // HEART LIKE BUTTONS
+    document.querySelectorAll('.heart-btn').forEach(btn=>{
+      btn.addEventListener('click', e=>{
+        e.stopPropagation();
+        const span = btn.querySelector('.likes');
+        let n = parseInt(span.textContent||'0',10);
+        n++; span.textContent = n;
+        btn.animate([{transform:'scale(1)'},{transform:'scale(1.15)'},{transform:'scale(1)'}],{duration:350,easing:'cubic-bezier(.2,.8,.2,1)'});
+      })
+    });
+
+    // PARTICLE CANVAS: hearts floating
+    const canvas = document.getElementById('particles');
+    const ctx = canvas.getContext('2d');
+    let DPR = window.devicePixelRatio || 1;
+    
+    function resize(){
+      DPR = window.devicePixelRatio || 1;
+      canvas.width = window.innerWidth * DPR;
+      canvas.height = window.innerHeight * DPR;
+      ctx.scale(DPR,DPR);
+    }
+    resize(); window.addEventListener('resize', resize);
+
+    function Heart(x,y, vx, vy, size, hue){
+      this.x=x; this.y=y; this.vx=vx; this.vy=vy; this.size=size; this.hue=hue; this.life=1;
+    }
+    Heart.prototype.draw = function(ctx){
+      ctx.save();
+      ctx.translate(this.x,this.y);
+      ctx.beginPath();
+      const s = this.size/20;
+      ctx.moveTo(0, -6*s);
+      ctx.bezierCurveTo(12*s, -30*s, 40*s, -8*s, 0, 18*s);
+      ctx.bezierCurveTo(-40*s, -8*s, -12*s, -30*s, 0, -6*s);
+      ctx.closePath();
+      ctx.fillStyle = `hsla(${this.hue},90%,65%,${this.life})`;
+      ctx.fill();
+      ctx.restore();
+    }
+
+    const hearts = [];
+    const maxHearts = 120;
+    let running = true;
+
+    function spawnRandom(){
+      const w = window.innerWidth; 
+      const h = window.innerHeight; 
+      
+      const x = Math.random()*w; 
+      const y = h + 20 + Math.random()*60; 
+      
+      const vx = (Math.random()-0.5)*0.6; 
+      const vy = -(1+Math.random()*1.6);
+      const size = 12 + Math.random()*28;
+      const hue = 320 + Math.random()*40; 
+      hearts.push(new Heart(x,y,vx,vy,size,hue));
+      if(hearts.length>maxHearts) hearts.shift();
+    }
+
+    // spawn some initially
+    for(let i=0;i<30;i++) spawnRandom();
+
+    function step(){
+      if(!running){ requestAnimationFrame(step); return; }
+      ctx.clearRect(0,0,canvas.clientWidth * DPR,canvas.clientHeight * DPR);
+      
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,240,250,0.06)';
+      ctx.fillRect(0,0,canvas.clientWidth, canvas.clientHeight);
+      ctx.restore();
+
+      for(let i=0;i<hearts.length;i++){
+        const h = hearts[i];
+        h.x += h.vx; h.y += h.vy; h.vy -= 0.002; h.life -= 0.003;
+        h.x += Math.sin((Date.now()+i*100)/1200 + i)*0.15; 
+        h.draw(ctx);
+      }
+      if(Math.random() < 0.35) spawnRandom();
+      requestAnimationFrame(step);
+    }
+    step();
+
+    // buttons
+    document.getElementById('addHeart').addEventListener('click', ()=>{
+      for(let i=0;i<12;i++) spawnRandom();
+    });
+    document.getElementById('toggleAuto').addEventListener('click', ()=>{ running = !running; });
+
+    // accessibility: keyboard close
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape'){ lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); } });
+  </script>
+</body>
+</html>
