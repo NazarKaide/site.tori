@@ -173,6 +173,34 @@
             .grid-item { grid-column: 1 / 13 !important; height: 400px !important; margin-top: 0 !important; }
             .hero-content h1 { font-size: 4rem; }
         }
+        /* 1. Центрування на сторінці */
+        .video-wrapper {
+            display: flex;             /* Вмикаємо Flexbox */
+            justify-content: center;   /* Центруємо по горизонталі */
+            align-items: center;       /* Центруємо по вертикалі (якщо є висота) */
+            padding: 20px;             /* Відступи навколо, щоб відео "дихало" */
+            background: linear-gradient(to top, #111, transparent); /* Світлий фон сторінки для контрасту */
+        }
+
+        /* 2. Стилізація самого плеєра */
+        video {
+            width: 100%;               /* Адаптивність: відео займе всю ширину контейнера... */
+            max-width: 800px;          /* ...але не більше 800px */
+            height: auto;              /* Зберігаємо пропорції */
+    
+            border-radius: 15px;       /* Заокруглені кути */
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Глибока, красива тінь */
+    
+            border: 4px solid #fff;    /* Біла рамка навколо відео */
+            outline: none;             /* Прибираємо стандартну рамку браузера при кліку */
+            transition: transform 0.3s ease; /* Плавна анімація при наведенні */
+        }
+
+/* 3. Ефект при наведенні мишки (опціонально) */
+        video:hover {
+            transform: scale(1.02);    /* Легке збільшення при наведенні */
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* Тінь стає сильнішою */
+        }
     </style>
 </head>
 <body>
@@ -211,6 +239,13 @@
             </div>
         </div>
     </section>
+
+    <div class="video-wrapper">
+        <video controls poster="img\photo_2025-05-08_16-50-54.jpg">
+            <source src="img\0118.mp4" type="video/mp4">
+            Ваш браузер не підтримує відео.
+        </video>
+    </div>
 
     <section class="contact-section">
         <div data-aos="zoom-out">
