@@ -30,7 +30,7 @@
             overflow-x: hidden;
         }
 
-        /* --- Прелоадер (ефект при завантаженні) --- */
+        /* --- Прелоадер --- */
         .loader {
             position: fixed;
             inset: 0;
@@ -42,7 +42,7 @@
             animation: fadeOut 1.5s forwards 2s; 
         }
 
-        /* --- Головна секція з відео або фото --- */
+        /* --- Головна секція --- */
         .hero {
             height: 100vh;
             width: 100%;
@@ -67,13 +67,14 @@
         .hero-content {
             z-index: 10;
             text-align: center;
+            padding: 0 20px; /* Відступи по боках для мобільного */
         }
 
         .hero-content h1 {
             font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(4rem, 12vw, 9rem);
+            font-size: clamp(3rem, 10vw, 9rem); /* Адаптивний розмір шрифту */
             font-weight: 300;
-            line-height: 0.8;
+            line-height: 0.9;
             margin-bottom: 20px;
             text-transform: uppercase;
         }
@@ -89,7 +90,8 @@
         }
 
         .grid-container {
-            display: flex;
+            /* ВИПРАВЛЕНО: тут має бути grid, а не flex */
+            display: grid; 
             grid-template-columns: repeat(12, 1fr);
             gap: 20px;
         }
@@ -112,13 +114,13 @@
             transform: scale(1.1);
         }
 
-        /* Стильне розташування сітки */
+        /* Розташування сітки (Desktop) */
         .img-1 { grid-column: 1 / 7; height: 600px; }
         .img-2 { grid-column: 7 / 13; height: 400px; margin-top: 100px; }
         .img-3 { grid-column: 2 / 6; height: 500px; }
         .img-4 { grid-column: 6 / 12; height: 700px; margin-top: -150px; }
 
-        /* --- Текстовий блок з ефектом розмиття --- */
+        /* --- Текстовий блок --- */
         .philosophy {
             padding: 100px 10%;
             text-align: center;
@@ -129,6 +131,7 @@
             font-size: 3.5rem;
             color: var(--accent);
             margin-bottom: 30px;
+            line-height: 1.1;
         }
 
         .philosophy p {
@@ -138,6 +141,32 @@
             letter-spacing: 1px;
             font-weight: 200;
             opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        /* --- Відео --- */
+        .video-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(to top, #111, transparent);
+        }
+
+        video {
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 4px solid rgba(255, 255, 255, 0.1); /* Трохи прозоріша рамка */
+            outline: none;
+            transition: transform 0.3s ease;
+        }
+
+        video:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
         }
 
         /* --- Кнопка та Футер --- */
@@ -153,10 +182,10 @@
             color: var(--text);
             text-decoration: none;
             border: 1px solid var(--accent);
-            padding: 20px 60px;
+            padding: 15px 40px;
             position: relative;
             transition: all 0.4s;
-            overflow: hidden;
+            display: inline-block; /* Щоб padding працював коректно */
         }
 
         .cta-btn:hover {
@@ -168,49 +197,58 @@
             to { opacity: 0; visibility: hidden; }
         }
 
-        /* Адаптивність для мобільних */
+        /* ========================================= */
+        /* АДАПТИВНІСТЬ (MOBILE)            */
+        /* ========================================= */
+        
+        @media (max-width: 1024px) {
+            /* Планшети: зменшуємо відступи */
+            .showcase { padding: 100px 5%; }
+            .img-1 { height: 450px; }
+            .img-2 { height: 350px; }
+            .img-3 { height: 400px; }
+            .img-4 { height: 500px; }
+        }
+
         @media (max-width: 768px) {
-            .grid-item { grid-column: 1 / 13 !important; height: 400px !important; margin-top: 0 !important; }
-            .hero-content h1 { font-size: 4rem; }
-        }
-        /* 1. Центрування на сторінці */
-        .video-wrapper {
-            display: flex;             /* Вмикаємо Flexbox */
-            justify-content: center;   /* Центруємо по горизонталі */
-            align-items: center;       /* Центруємо по вертикалі (якщо є висота) */
-            padding: 20px;             /* Відступи навколо, щоб відео "дихало" */
-            background: linear-gradient(to top, #111, transparent); /* Світлий фон сторінки для контрасту */
-        }
+            /* Мобільні телефони */
+            
+            /* Секція showcase: менше відступів */
+            .showcase { padding: 60px 5%; }
 
-        /* 2. Стилізація самого плеєра */
-        video {
-            width: 100%;               /* Адаптивність: відео займе всю ширину контейнера... */
-            max-width: 800px;          /* ...але не більше 800px */
-            height: auto;              /* Зберігаємо пропорції */
-    
-            border-radius: 15px;       /* Заокруглені кути */
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); /* Глибока, красива тінь */
-    
-            border: 4px solid #fff;    /* Біла рамка навколо відео */
-            outline: none;             /* Прибираємо стандартну рамку браузера при кліку */
-            transition: transform 0.3s ease; /* Плавна анімація при наведенні */
-        }
+            /* Перебудова сітки в одну колонку */
+            .grid-item { 
+                grid-column: 1 / -1 !important; /* На всю ширину */
+                width: 100%;
+                height: 350px !important; /* Фіксована висота для мобілок */
+                margin-top: 0 !important; /* Прибираємо зсув */
+                margin-bottom: 20px;
+            }
 
-/* 3. Ефект при наведенні мишки (опціонально) */
-        video:hover {
-            transform: scale(1.02);    /* Легке збільшення при наведенні */
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4); /* Тінь стає сильнішою */
+            /* Зменшуємо шрифти */
+            .hero-content h1 { font-size: 3.5rem; }
+            
+            .philosophy { padding: 60px 5%; }
+            .philosophy h2 { font-size: 2.2rem; }
+            .philosophy p { font-size: 1rem; }
+
+            /* Відео */
+            .video-wrapper { padding: 10px; }
+            
+            /* Кнопка */
+            .cta-btn { font-size: 1.5rem; padding: 12px 30px; }
+            .contact-section { padding: 60px 0; }
         }
     </style>
 </head>
 <body>
 
     <div class="loader">
-        <h2 style="font-family: 'Cormorant Garamond', serif; letter-spacing: 5px;">COLLECTION 2026</h2>
+        <h2 style="font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; font-size: 1.5rem;">COLLECTION 2026</h2>
     </div>
 
     <section class="hero">
-        <img src="img\1.jpg" class="hero-video-bg">
+        <img src="img/1.jpg" class="hero-video-bg">
         <div class="hero-content">
             <p data-aos="fade-up" data-aos-delay="2200">ESTABLISHED IN UKRAINE</p>
             <h1 data-aos="fade-up" data-aos-delay="2400">VIC<span>TORI</span></h1>
@@ -226,23 +264,23 @@
     <section class="showcase">
         <div class="grid-container">
             <div class="grid-item img-1" data-aos="fade-right">
-                <img src="img\11.jpg" alt="1">
+                <img src="img/11.jpg" alt="1">
             </div>
             <div class="grid-item img-2" data-aos="fade-left">
-                <img src="img\12.jpg" alt="2">
+                <img src="img/12.jpg" alt="2">
             </div>
             <div class="grid-item img-3" data-aos="zoom-in-up">
-                <img src="img\13.jpg" alt="3">
+                <img src="img/13.jpg" alt="3">
             </div>
             <div class="grid-item img-4" data-aos="fade-up">
-                <img src="img\14.jpg" alt="4">
+                <img src="img/14.jpg" alt="4">
             </div>
         </div>
     </section>
 
     <div class="video-wrapper">
-        <video controls poster="img\0001.jpg">
-            <source src="img\0118.mp4" type="video/mp4">
+        <video controls poster="img/0001.jpg">
+            <source src="img/0118.mp4" type="video/mp4">
             Ваш браузер не підтримує відео.
         </video>
     </div>
