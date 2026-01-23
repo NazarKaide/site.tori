@@ -3,300 +3,225 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VICTORIA</title>
+    <title>VICTORIA | Haute Couture Visuals</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@200;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,600;1,400&family=Montserrat:wght@100;200;400&display=swap" rel="stylesheet">
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #0a0a0a;
+            --bg: #050505;
             --text: #ffffff;
-            --accent: #c5a47e; /* Золотисто-бежевий */
-            --glass: rgba(255, 255, 255, 0.05);
+            --accent: #d4b08c;
+            --subtle: rgba(255, 255, 255, 0.1);
+            --transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            scroll-behavior: smooth;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none; }
 
         body {
             background-color: var(--bg);
             color: var(--text);
             font-family: 'Montserrat', sans-serif;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* --- Прелоадер --- */
+        /* Noise Overlay */
+        .noise {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+            opacity: 0.04; pointer-events: none; z-index: 9999;
+        }
+
+        /* Custom Cursor */
+        #cursor {
+            position: fixed; width: 8px; height: 8px; background: #fff;
+            border-radius: 50%; pointer-events: none; z-index: 10000; mix-blend-mode: difference;
+        }
+        #cursor-follower {
+            position: fixed; width: 40px; height: 40px; border: 1px solid var(--accent);
+            border-radius: 50%; pointer-events: none; z-index: 9999;
+            transition: width 0.3s, height 0.3s, background 0.3s;
+        }
+
+        /* --- Loader --- */
         .loader {
-            position: fixed;
-            inset: 0;
-            background: #000;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            animation: fadeOut 1.5s forwards 2s; 
+            position: fixed; inset: 0; background: #000; z-index: 10001;
+            display: flex; align-items: center; justify-content: center;
+            animation: fadeOut 1s forwards 2.8s;
+        }
+        .loader-text {
+            font-family: 'Cormorant Garamond', serif; font-size: 1rem;
+            letter-spacing: 15px; text-transform: uppercase;
+            overflow: hidden; white-space: nowrap;
+            border-right: 2px solid var(--accent);
+            animation: typing 2s steps(20, end), blink 0.5s step-end infinite;
         }
 
-        /* --- Головна секція --- */
+        /* --- Hero --- */
         .hero {
-            height: 100vh;
-            width: 100%;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            position: relative; perspective: 1000px;
         }
-
-        .hero-video-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            opacity: 0.6;
-            filter: saturate(0);
-        }
-
-        .hero-content {
-            z-index: 10;
-            text-align: center;
-            padding: 0 20px; /* Відступи по боках для мобільного */
-        }
-
-        .hero-content h1 {
+        .hero-title {
             font-family: 'Cormorant Garamond', serif;
-            font-size: clamp(3rem, 10vw, 9rem); /* Адаптивний розмір шрифту */
-            font-weight: 300;
-            line-height: 0.9;
-            margin-bottom: 20px;
-            text-transform: uppercase;
+            font-size: clamp(5rem, 20vw, 15rem);
+            font-weight: 300; line-height: 0.8;
+            z-index: 10; pointer-events: none;
+            text-align: center; mix-blend-mode: difference;
+        }
+        .hero-img {
+            position: absolute; width: 30%; height: 60vh;
+            object-fit: cover; filter: grayscale(1) brightness(0.5);
+            transition: var(--transition); z-index: 5;
+        }
+        .hero:hover .hero-img { filter: grayscale(0) brightness(0.8); transform: scale(1.05); }
+
+        /* --- Marquee (Рухомий рядок) --- */
+        .marquee {
+            padding: 100px 0; overflow: hidden; white-space: nowrap;
+            border-top: 1px solid var(--subtle); border-bottom: 1px solid var(--subtle);
+        }
+        .marquee-inner {
+            display: inline-block; animation: marquee 20s linear infinite;
+        }
+        .marquee span {
+            font-family: 'Cormorant Garamond', serif; font-size: 5rem;
+            font-style: italic; margin-right: 50px; opacity: 0.2;
         }
 
-        .hero-content span {
-            color: var(--accent);
-            font-style: italic;
-        }
-
-        /* --- Секція з плаваючими фото --- */
-        .showcase {
-            padding: 150px 5%;
-        }
-
+        /* --- Showcase Grid --- */
+        .showcase { padding: 100px 8%; }
         .grid-container {
-            /* ВИПРАВЛЕНО: тут має бути grid, а не flex */
-            display: grid; 
-            grid-template-columns: repeat(12, 1fr);
-            gap: 20px;
+            display: grid; grid-template-columns: repeat(12, 1fr); gap: 60px;
         }
-
         .grid-item {
-            position: relative;
-            overflow: hidden;
-            border-radius: 10px;
-            transition: transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+            position: relative; overflow: hidden; background: #111;
+            transition: transform 0.5s ease-out;
         }
-
         .grid-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 1.5s scale 1.2;
+            width: 100%; height: 100%; object-fit: cover;
+            scale: 1.3; transition: transform 2.5s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
-        .grid-item:hover img {
-            transform: scale(1.1);
-        }
-
-        /* Розташування сітки (Desktop) */
-        .img-1 { grid-column: 1 / 7; height: 600px; }
-        .img-2 { grid-column: 7 / 13; height: 400px; margin-top: 100px; }
-        .img-3 { grid-column: 2 / 6; height: 500px; }
-        .img-4 { grid-column: 6 / 12; height: 700px; margin-top: -150px; }
-
-        /* --- Текстовий блок --- */
-        .philosophy {
-            padding: 100px 10%;
-            text-align: center;
-        }
-
-        .philosophy h2 {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 3.5rem;
-            color: var(--accent);
-            margin-bottom: 30px;
-            line-height: 1.1;
-        }
-
-        .philosophy p {
-            max-width: 700px;
-            margin: 0 auto;
-            font-size: 1.1rem;
-            letter-spacing: 1px;
-            font-weight: 200;
-            opacity: 0.8;
-            line-height: 1.6;
-        }
-
-        /* --- Відео --- */
-        .video-wrapper {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-            background: linear-gradient(to top, #111, transparent);
-        }
-
-        video {
-            width: 100%;
-            max-width: 800px;
-            height: auto;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            border: 4px solid rgba(255, 255, 255, 0.1); /* Трохи прозоріша рамка */
-            outline: none;
-            transition: transform 0.3s ease;
-        }
-
-        video:hover {
-            transform: scale(1.02);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        /* --- Кнопка та Футер --- */
-        .contact-section {
-            padding: 100px 0;
-            text-align: center;
-            background: linear-gradient(to top, #111, transparent);
-        }
-
-        .cta-btn {
-            font-family: 'Cormorant Garamond', serif;
-            font-size: 2rem;
-            color: var(--text);
-            text-decoration: none;
-            border: 1px solid var(--accent);
-            padding: 15px 40px;
-            position: relative;
-            transition: all 0.4s;
-            display: inline-block; /* Щоб padding працював коректно */
-        }
-
-        .cta-btn:hover {
-            color: #000;
-            background: var(--accent);
-        }
-
-        @keyframes fadeOut {
-            to { opacity: 0; visibility: hidden; }
-        }
-
-        /* ========================================= */
-        /* АДАПТИВНІСТЬ (MOBILE)            */
-        /* ========================================= */
+        .grid-item:hover img { transform: scale(1.1); }
         
-        @media (max-width: 1024px) {
-            /* Планшети: зменшуємо відступи */
-            .showcase { padding: 100px 5%; }
-            .img-1 { height: 450px; }
-            .img-2 { height: 350px; }
-            .img-3 { height: 400px; }
-            .img-4 { height: 500px; }
-        }
+        .img-1 { grid-column: 1 / 9; height: 90vh; }
+        .img-2 { grid-column: 9 / 13; height: 50vh; align-self: center; }
+        .img-3 { grid-column: 2 / 7; height: 70vh; margin-top: -50px; }
+        .img-4 { grid-column: 7 / 12; height: 80vh; }
+
+        /* --- Animations --- */
+        @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes fadeOut { to { opacity: 0; visibility: hidden; } }
+        @keyframes blink { from, to { border-color: transparent } 50% { border-color: var(--accent); } }
 
         @media (max-width: 768px) {
-            /* Мобільні телефони */
-            
-            /* Секція showcase: менше відступів */
-            .showcase { padding: 60px 5%; }
-
-            /* Перебудова сітки в одну колонку */
-            .grid-item { 
-                grid-column: 1 / -1 !important; /* На всю ширину */
-                width: 100%;
-                height: 350px !important; /* Фіксована висота для мобілок */
-                margin-top: 0 !important; /* Прибираємо зсув */
-                margin-bottom: 20px;
-            }
-
-            /* Зменшуємо шрифти */
-            .hero-content h1 { font-size: 3.5rem; }
-            
-            .philosophy { padding: 60px 5%; }
-            .philosophy h2 { font-size: 2.2rem; }
-            .philosophy p { font-size: 1rem; }
-
-            /* Відео */
-            .video-wrapper { padding: 10px; }
-            
-            /* Кнопка */
-            .cta-btn { font-size: 1.5rem; padding: 12px 30px; }
-            .contact-section { padding: 60px 0; }
+            .grid-item { grid-column: 1 / -1 !important; height: 50vh !important; margin: 0 !important; }
+            .hero-img { width: 80%; }
+            * { cursor: auto !important; }
+            #cursor, #cursor-follower { display: none; }
         }
     </style>
 </head>
 <body>
 
+    <div class="noise"></div>
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
+
     <div class="loader">
-        <h2 style="font-family: 'Cormorant Garamond', serif; letter-spacing: 5px; font-size: 1.5rem;">COLLECTION 2026</h2>
+        <div class="loader-text">VICTORIA</div>
     </div>
 
-    <section class="hero">
-        <img src="img/1.jpg" class="hero-video-bg">
-        <div class="hero-content">
-            <p data-aos="fade-up" data-aos-delay="2200">ESTABLISHED IN UKRAINE</p>
-            <h1 data-aos="fade-up" data-aos-delay="2400">VIC<span>TORI</span></h1>
-            <p data-aos="fade-up" data-aos-delay="2600">Visual Artist & Muse</p>
-        </div>
-    </section>
+    <main id="main-content">
+        <section class="hero">
+            <img src="img/photo_2025-05-03_14-22-00.jpg" class="hero-img" alt="">
+            <h1 class="hero-title" data-aos="zoom-in">VICTORI</h1>
+        </section>
 
-    <section class="philosophy" data-aos="fade-in">
-        <h2>Естетика моменту</h2>
-        <p>Кожен кадр — це історія, яку неможливо повторити. Я вірю, що справжня краса криється в тиші та ледь помітних деталях.</p>
-    </section>
-
-    <section class="showcase">
-        <div class="grid-container">
-            <div class="grid-item img-1" data-aos="fade-right">
-                <img src="img/11.jpg" alt="1">
-            </div>
-            <div class="grid-item img-2" data-aos="fade-left">
-                <img src="img/12.jpg" alt="2">
-            </div>
-            <div class="grid-item img-3" data-aos="zoom-in-up">
-                <img src="img/13.jpg" alt="3">
-            </div>
-            <div class="grid-item img-4" data-aos="fade-up">
-                <img src="img/14.jpg" alt="4">
+        <div class="marquee">
+            <div class="marquee-inner">
+                <span>Тори</span> <span>COLLECTION 2026</span> <span>Тори</span> 
+                <span>Тори</span> <span>COLLECTION 2026</span> <span>Тори</span>
             </div>
         </div>
-    </section>
 
-    <div class="video-wrapper">
-        <video controls poster="img/0001.jpg">
-            <source src="img/0118.mp4" type="video/mp4">
-            Ваш браузер не підтримує відео.
-        </video>
-    </div>
+        <section class="philosophy" style="padding: 150px 10%; position: relative;">
+            <div style="width: 1px; height: 100px; background: var(--accent); margin: 0 auto 50px;"></div>
+            <h2 style="font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 5vw, 4rem); text-align: center;" data-aos="fade-up">
+                Кожен погляд. <br> Кожна секунда.
+            </h2>
+        </section>
 
-    <section class="contact-section">
-        <div data-aos="zoom-out">
-            <a href="https://www.instagram.com/you__moron/" class="cta-btn">Follow the journey</a>
-        </div>
-    </section>
+        <section class="showcase">
+            <div class="grid-container">
+                <div class="grid-item img-1" data-aos="fade-right">
+                    <img src="img/2.jpg" alt="">
+                </div>
+                <div class="grid-item img-2" data-aos="fade-left">
+                    <img src="img/4.jpg" alt="">
+                </div>
+                <div class="grid-item img-3" data-aos="fade-up">
+                    <img src="img/3.jpg" alt="">
+                </div>
+                <div class="grid-item img-4" data-aos="fade-up" data-aos-delay="200">
+                    <img src="img/photo_2026-01-11_14-09-56.jpg" alt="">
+                </div>
+            </div>
+        </section>
+
+        <footer style="padding: 100px 5%; text-align: center; border-top: 1px solid var(--subtle);">
+            <a href="https://www.instagram.com/you__moron/" style="font-family: 'Cormorant Garamond', serif; color: var(--accent); font-size: 2rem; text-decoration: none;" class="magnetic">
+                Instagram / @you__moron
+            </a>
+        </footer>
+    </main>
 
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        AOS.init({
-            duration: 1200,
-            once: false,
-            mirror: true
+        AOS.init({ duration: 1500, once: false });
+
+        // Custom Cursor Logic
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
+        let cx = 0, cy = 0, fx = 0, fy = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            cx = e.clientX;
+            cy = e.clientY;
+            cursor.style.transform = `translate(${cx}px, ${cy}px)`;
+        });
+
+        // Плавне слідування фолловера
+        function animate() {
+            fx += (cx - fx - 20) * 0.1;
+            fy += (cy - fy - 20) * 0.1;
+            follower.style.transform = `translate(${fx}px, ${fy}px)`;
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 3D Tilt Effect для карток
+        document.querySelectorAll('.grid-item').forEach(item => {
+            item.addEventListener('mousemove', (e) => {
+                const { left, top, width, height } = item.getBoundingClientRect();
+                const x = (e.clientX - left) / width - 0.5;
+                const y = (e.clientY - top) / height - 0.5;
+                
+                item.style.transform = `perspective(1000px) rotateY(${x * 10}deg) rotateX(${-y * 10}deg) scale3d(1.02, 1.02, 1.02)`;
+                follower.style.width = '100px';
+                follower.style.height = '100px';
+                follower.style.background = 'rgba(255,255,255,0.05)';
+            });
+
+            item.addEventListener('mouseleave', () => {
+                item.style.transform = `perspective(1000px) rotateY(0) rotateX(0) scale3d(1, 1, 1)`;
+                follower.style.width = '40px';
+                follower.style.height = '40px';
+                follower.style.background = 'transparent';
+            });
         });
     </script>
 </body>
